@@ -122,8 +122,11 @@ function shuffle(array) {
 }
 
 const POPULATION_SIZE = 100;
-const NUM_CITIES = 20;
+const NUM_CITIES = 40;
 const NUM_SUCCESSFUL = 20;
+const POINT_SWAP_CHANCE = 0.6;
+const SECTION_SWAP_CHANCE = 0.3;
+const SECTION_REVERSE_CHANCE = 0.3;
 
 let canvas = document.getElementById('canv');
 let cx = canvas.getContext('2d');
@@ -138,9 +141,13 @@ let displayCallBack = () => {
           population[getRandomInt(0,NUM_SUCCESSFUL)].path,
           population[getRandomInt(0,NUM_SUCCESSFUL)].path
         );
-    if (Math.random() < 0.2) newPath = mutateReverseSection(newPath);
-    if (Math.random() < 0.2) newPath = mutateSwapSection(newPath);
-    if (Math.random() < 0.6) newPath = mutateSwap(newPath);
+
+    if (Math.random() < POINT_SWAP_CHANCE)
+      newPath = mutateSwap(newPath);
+    if (Math.random() < SECTION_SWAP_CHANCE) 
+      newPath = mutateSwapSection(newPath);
+    if (Math.random() < SECTION_REVERSE_CHANCE)
+      newPath = mutateReverseSection(newPath);
 
     addToPopulation(newPath);
   }
@@ -153,7 +160,9 @@ let displayCallBack = () => {
 }
 
 drawNodes(cities);
-displayPath(cities, population[0].path, displayCallBack);
+setTimeout(() => {
+  displayPath(cities, population[0].path, displayCallBack);
+}, 2000);
 
 function addToPopulation(path) {
   population.push({path: path, fitness: fitness(path)});
@@ -192,7 +201,7 @@ function generatePath() {
 function displayPath(nodes, sequence, callback) {
   let i = 1;
   function step() {
-    if (i == nodes.length) { setTimeout(callback, 100); return; }
+    if (i == nodes.length) { setTimeout(callback, 50); return; }
     let start = nodes[sequence[i-1]];
     let end = nodes[sequence[i]];
     cx.beginPath();
