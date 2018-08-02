@@ -122,10 +122,10 @@ function shuffle(array) {
 }
 
 const POPULATION_SIZE = 100;
-const NUM_CITIES = 40;
-const NUM_SUCCESSFUL = 20;
+const NUM_CITIES = 30;
+const NUM_SUCCESSFUL = 40;
 const POINT_SWAP_CHANCE = 0.6;
-const SECTION_SWAP_CHANCE = 0.3;
+const SECTION_SWAP_CHANCE = 0.5;
 const SECTION_REVERSE_CHANCE = 0.3;
 
 let canvas = document.getElementById('canv');
@@ -133,14 +133,21 @@ let cx = canvas.getContext('2d');
 let cities = generateNodes();
 let population = generatePopulation();
 
+let fitnessTracker = {
+  best: [],
+  worst: [],
+  median: [],
+}
+
+
 let displayCallBack = () => {
   population.length = NUM_SUCCESSFUL;
   for (let i = NUM_SUCCESSFUL; i < POPULATION_SIZE; i++) {
     let newPath = 
-        PMX(
-          population[getRandomInt(0,NUM_SUCCESSFUL)].path,
-          population[getRandomInt(0,NUM_SUCCESSFUL)].path
-        );
+      PMX(
+        population[getRandomInt(0,NUM_SUCCESSFUL)].path,
+        population[getRandomInt(0,NUM_SUCCESSFUL)].path
+      );
 
     if (Math.random() < POINT_SWAP_CHANCE)
       newPath = mutateSwap(newPath);
@@ -157,12 +164,20 @@ let displayCallBack = () => {
   canvas.width = canvas.width;
   drawNodes(cities);
   displayPath(cities, population[0].path, displayCallBack);
+
+  //Tracking fitness
+  fitnessTracker.best.push(population[0].fitness);
+  fitnessTracker.worst.push(population[POPULATION_SIZE-1].fitness);
+  fitnessTracker.median.push(population[Math.floor(POPULATION_SIZE/2)].fitness);
+  visFitness(
+    fitnessTracker.best, 
+    fitnessTracker.worst, 
+    [fitnessTracker.median]
+  );
 }
 
 drawNodes(cities);
-setTimeout(() => {
-  displayPath(cities, population[0].path, displayCallBack);
-}, 2000);
+displayPath(cities, population[0].path, displayCallBack);
 
 function addToPopulation(path) {
   population.push({path: path, fitness: fitness(path)});
