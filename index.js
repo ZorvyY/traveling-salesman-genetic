@@ -269,10 +269,10 @@ function mutateSwap(sequence) {
 
 function mutateSwapSection(sequence) {
   let size = getRandomInt(1, sequence.length / 2);
-  let pivot = getRandomInt(size, sequence.length - size);
+  let pivot = getRandomInt(0, sequence.length - size);
   let newSeq = sequence.slice(0);
   let segment = newSeq.splice(pivot, size);
-  newSeq.splice(pivot - size, 0, ...segment);
+  newSeq.splice(getRandomInt(0, newSeq.length), 0, ...segment);
   return newSeq;
 }
 
